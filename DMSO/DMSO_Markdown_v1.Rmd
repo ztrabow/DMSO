@@ -1,0 +1,33 @@
+
+---
+title: "DMSO_Proj"
+author: "Zachary Rabow"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r Load_data, warning=FALSE}
+DMSO <- readr::read_csv("DMSO_03_07_2020.csv")
+```
+
+```{r col_naming}
+DMSO <- rename(DMSO, "Cortex_Control_0" = "Cortex_Control")
+DMSO <- rename(DMSO, "Cortex_LowDMSO_0" = "Cortex_LowDMSO")
+colnames(DMSO)
+```
+
+```{r Gathering}
+
+DMSO <- DMSO %>% 
+  gather(Cortex_Control_0, Cortex_Control_1, Cortex_Control_2, Cortex_Control_3, Cortex_Control_4, key="Replicate", value= "Peak_Height")
+  
+DMSO <- DMSO %>% 
+  gather(Cortex_LowDMSO_0, Cortex_LowDMSO_1, Cortex_LowDMSO_2, Cortex_LowDMSO_3, Cortex_LowDMSO_4, key="Replicate", value= "Peak_Height") 
+
+colnames(DMSO)
+```
+

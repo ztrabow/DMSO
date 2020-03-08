@@ -1,0 +1,107 @@
+---
+title: "DMSO_Proj"
+author: "Zachary Rabow"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(nnet)
+library(stats)
+library(car)
+```
+
+```{r Load_data, warning=FALSE}
+DMSO <- readr::read_csv("DMSO_clean_data.csv")
+```
+
+```{r}
+DMSO <- DMSO %>% 
+  gather(key = "Metabolite", value = Peak_Height, -Organ, -Treatment, -'Sample ID') %>%
+  mutate(
+  #log10.intensity = log10(intensitsy), 
+  Treatment = relevel(as.factor(Treatment), ref = "Control PBS"))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## none of this is working :D
+
+```{r}
+#DMSO_split <- DMSO %>% 
+#  split(f = "Metabolite")
+
+```
+
+```{r}
+DMSO_split <- DMSO %>% 
+  split(f = Treatment)
+
+```
+
+
+```{r}
+DMSO_split2 <-
+  lapply(DMSO_split, 
+         function(x){
+            mod <- lm(Peak_Height ~ Treatment, data = x)
+            mod.anova <- Anova(mod, type = "III")
+            p<- mod.anova$`Pr(>F)`[1]
+            return(p)
+            }
+        )
+```
+
+
+```{r}
+DMSO_split2 <-
+  lapply(DMSO_split, )
+```
+
+```{r}
+ps.vec <- do.call(rbind, DMSO_split2)
+
+ps.adj <- p.adjust(ps.vec, method = "BH")
+
+results <- data_frame(metabolites = row.names(ps.vec),
+                      p.raw = ps.vec[,1], 
+                      p.adj = ps.adj,
+                      sig = ifelse(p.adj< 0.05, "blue", "black")
+                      )
+
+results.sig <- results %>%
+        filter(p.adj <= 0.05)
+
+results %>% 
+  ggplot(aes(x = "Metabolite", y = -log10(p.adj), color = sig))+
+  geom_point()+
+  geom_hline(yintercept = -log10(0.05), color = "blue")
+```
+
+
+
+
+
+
+
+
+```{r}
+lm
+```
+
+
